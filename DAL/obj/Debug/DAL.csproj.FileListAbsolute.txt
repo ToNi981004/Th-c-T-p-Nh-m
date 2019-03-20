@@ -1,0 +1,6 @@
+C:\Users\Trieu Van Linh\source\repos\QL_HSGVTHPT\DAL\obj\Debug\DAL.csprojAssemblyReference.cache
+C:\Users\Trieu Van Linh\source\repos\QL_HSGVTHPT\DAL\obj\Debug\DAL.csproj.CoreCompileInputs.cache
+C:\Users\Trieu Van Linh\source\repos\QL_HSGVTHPT\DAL\bin\Debug\DAL.dll
+C:\Users\Trieu Van Linh\source\repos\QL_HSGVTHPT\DAL\bin\Debug\DAL.pdb
+C:\Users\Trieu Van Linh\source\repos\QL_HSGVTHPT\DAL\obj\Debug\DAL.dll
+C:\Users\Trieu Van Linh\source\repos\QL_HSGVTHPT\DAL\obj\Debug\DAL.pdb
