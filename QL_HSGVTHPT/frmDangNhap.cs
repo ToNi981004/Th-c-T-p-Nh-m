@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Data.Sql;
 using System.Data.SqlClient;
 using System.Data.SqlTypes;
-
+using BLL;
 namespace QL_HSGVTHPT
 {
     public partial class frmDangNhap : Form
@@ -19,7 +19,7 @@ namespace QL_HSGVTHPT
         public string _TenDN;
         public string _ChucVu;
 
-        private string conn= @"Data Source=DESKTOP-HFIR0F6;Initial Catalog=QL_GVHSTHPT;Integrated Security=True";
+        frmDagNhap obj = new frmDagNhap();
 
         public frmDangNhap()
         {
@@ -51,28 +51,21 @@ namespace QL_HSGVTHPT
             _TenDN = txtTenDN.Text;
             _MatKhauDN = txtMKDN.Text;
             _ChucVu = txtChucVu.Text;
-
-            string Query = "Select*from GiaoVien where HoTen = N'" + _TenDN + "' AND MatKhauDN = N'" + _MatKhauDN + "' AND ChucVu = N'" + _ChucVu + "'";
-            using (SqlConnection sql = new SqlConnection(conn))
+            if(obj.KiemTra_MK(_TenDN,_MatKhauDN,_ChucVu)==true)
             {
-                sql.Open();
-                SqlCommand commad = new SqlCommand(Query, sql);
-                SqlDataReader data = commad.ExecuteReader();
-                if (data.Read() == true)
-                {
-                    frmMain fr = new frmMain(_TenDN, _ChucVu);
-                    this.Hide();
-                    fr.ShowDialog();
-                    fr.Close();
-                    //this.ShowDialog();
-                    Application.Exit();
-                }
-                else
-                {
-                    MessageBox.Show("Đăng Nhập Không Thành Công (Bạn nhập sai Tài khoản hoặc Mật khẩu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    ActiveControl = txtTenDN;
-                }
+                frmMain fr = new frmMain(_TenDN, _ChucVu);
+                this.Hide();
+                fr.ShowDialog();
+                fr.Close();
+                //this.ShowDialog();
+                Application.Exit();
             }
+            else if(obj.KiemTra_MK(_TenDN, _MatKhauDN, _ChucVu) == false)
+            {
+                MessageBox.Show("Đăng Nhập Không Thành Công (Bạn nhập sai Tài khoản hoặc Mật khẩu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                ActiveControl = txtTenDN;
+            }
+            
 
         }
         private void txtThoat_Click(object sender, EventArgs e)

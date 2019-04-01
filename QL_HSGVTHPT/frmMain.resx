@@ -14377,6 +14377,9 @@
         EszDg5xUnmfKV/Wqj/Kmepz/AFqXduX0+lK2gAXG48Z4+7jJFFNLFVwKKYz/2Q==
 </value>
   </data>
+  <metadata name="tmrTime.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>132, 17</value>
+  </metadata>
   <data name="groupBox3.BackgroundImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         /9j/4AAQSkZJRgABAQEASABIAAD/4QC4RXhpZgAATU0AKgAAAAgABAESAAMAAAABAAgAAAExAAIAAAAm
@@ -16923,7 +16926,4 @@
         //m/iAwCy+RaWKYAAAAASUVORK5CYII=
 </value>
   </data>
-  <metadata name="tmrTime.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>132, 17</value>
-  </metadata>
 </root>

@@ -35,15 +35,14 @@ namespace DAL
         }
 
         // Mở kết nối
+        
         public bool Open_KetNoiCSDL()
         {
             try
             {
-                if (myConnectSQL.State == System.Data.ConnectionState.Closed)// kiểm tra nếu đóng thì mở 
+                if (myConnectSQL.State == System.Data.ConnectionState.Closed||myConnectSQL.State== System.Data.ConnectionState.Open)// kiểm tra nếu đóng thì mở 
                 {
                     myConnectSQL.Open();
-             
-
                 }
                 return true;
             }
@@ -59,7 +58,7 @@ namespace DAL
         {
             try
             {
-                if (myConnectSQL.State == System.Data.ConnectionState.Open)
+                if (myConnectSQL.State == System.Data.ConnectionState.Open || myConnectSQL.State == System.Data.ConnectionState.Closed)
                     myConnectSQL.Close();
                 return true;
             }
@@ -68,13 +67,13 @@ namespace DAL
                 return false;
             }
         }
-
+        
         // Câu lệnh Select
         public DataTable LayDuLieuBang(string strQuery)
         {
             try
             {
-                Open_KetNoiCSDL();// Mở Kết nối
+                Open_KetNoiCSDL();
                 SqlCommand myCommand = new SqlCommand();
                 myCommand.CommandType = CommandType.Text;
                 myCommand.CommandText = strQuery;
@@ -84,14 +83,29 @@ namespace DAL
                 SqlDataAdapter dataAdapter = new SqlDataAdapter();
                 dataAdapter.SelectCommand = myCommand;
                 dataAdapter.Fill(dataTable);// đổ dữ liệu
-
+                Close_KetNoiCSDL();
                 return dataTable;
+                
 
             }
             catch(SqlException ex)
             {
                 return null;
             }
+        }
+
+        
+        public bool sql_KiemTra(string Query)
+        {
+            bool kt; 
+            myConnectSQL.Open();
+            SqlCommand command = new SqlCommand(Query, myConnectSQL);
+            SqlDataReader data = command.ExecuteReader();
+            kt = data.Read();
+            myConnectSQL.Close();
+            return kt;
+
+            
         }
        
 

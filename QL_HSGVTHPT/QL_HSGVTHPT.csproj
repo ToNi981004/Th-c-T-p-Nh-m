@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -91,6 +92,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -114,6 +116,48 @@
       <Project>{2ddad2d0-a95b-470a-9427-3dfb14afae0d}</Project>
       <Name>DAL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mypc_lock.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\business_people_01.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sign_out.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\invoice.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bill_of_document.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\invoice %281%29.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\istockphoto-470002447-1024x1024.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\istockphoto-470002447-1024x10241.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\product.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\home_w.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\istockphoto-521262978-1024x1024.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\edit_find.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\gnome_dialog_question %281%29.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

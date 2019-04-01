@@ -16,7 +16,7 @@ namespace QL_HSGVTHPT
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmDanhMuc(0));
+            Application.Run(new frmDangNhap());
         }
     }
 }

@@ -1,17 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using BLL;
+using System;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Data.Sql;
 using System.Data.SqlClient;
+using System.Drawing;
 using System.IO;
-
-using BLL;
+using System.Windows.Forms;
 
 namespace QL_HSGVTHPT
 {
@@ -19,8 +12,9 @@ namespace QL_HSGVTHPT
     {
         frmDM_GiaoVien obj = new frmDM_GiaoVien();
         DataTable dtGV = new DataTable();
-        //ListBox ListBox = new ListBox();
+        DataTable dtHS = new DataTable();
 
+        private string TrungGian="";
         private string MaGV,HoTen, NgaySinh, GioiTinh, DiaChi, SDT_GV, ChucVu, QuocTich, DanToc, TonGiao, Email, MaMon;
         private string imgLocation = "";
         public int str;
@@ -35,14 +29,23 @@ namespace QL_HSGVTHPT
             InitializeComponent();
             this.str = s;
             tabpDanhMuc.SelectedIndex = s;
+            dtHS = obj.Diem_HS("1");
+            chartDiemHK_HS.DataSource = dtHS;
+            chartDiemHK_HS.ChartAreas["ChartArea1"].AxisX.Title = "Điểm";
+            chartDiemHK_HS.ChartAreas["ChartArea1"].AxisX.Title = "Học Kỳ";
+
+            chartDiemHK_HS.Series["Ngữ Văn"].XValueMember = 
 
             //Load Bảng Danh Sánh GV
             dtGV = obj.SelectGV();
             dgvGiaoVien.DataSource = dtGV;
 
+            // Load Diểm Học Sinh
+
+
             //Che dấu GroupBox
+            groupBoxAnhGV.Enabled = false;
             groupBoxThongTinCaNhan.Enabled = false;
-            
 
             // Khi load form thì vị trí con trỏ nằm trên thanh tìm kiếm
             ActiveControl = txtSearch;
@@ -51,14 +54,13 @@ namespace QL_HSGVTHPT
         }
         private void btnThem_Click(object sender, EventArgs e)
         {
-          
-           
-                // mở Group để thao tác
-                groupBoxThongTinCaNhan.Enabled = true;
-               
-                // chiển các giá trị trên Ô thông tin về Rỗng
-                int n = dgvGiaoVien.Rows.Count;
-                lbID.Text = "";
+        //int n = dgvGiaoVien.Rows.Count -1;
+        // mở Group để thao tác
+            groupBoxThongTinCaNhan.Enabled = true;
+        //Tăng ID lên 1
+        //   lbID.Text = Convert.ToString(n+1);
+        // chiển các giá trị trên Ô thông tin về Rỗng
+                lbID.Text = null;
                 txtHoTen.Text = "";
                 txtNgaySinh.Text = "";
                 txtGioiTinh.Text = "";
@@ -70,32 +72,53 @@ namespace QL_HSGVTHPT
                 txtTonGiao.Text = "";
                 txtEmail.Text = "";
                 pictGiaoVien.Image = null;
-                txtMonHoc.Text = "";
-               
-            
-
+                txtMonHoc.Text = "";      
         }
 
         private void btnSua_Click(object sender, EventArgs e)
         {
-
+            if(lbID.Text==""||lbID.Text=="ID")
+            {
+                MessageBox.Show("Bạn Chưa Chọn Giáo Viên Nào để Sửa !", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else
+            {
+                groupBoxAnhGV.Enabled = true;
+                groupBoxThongTinCaNhan.Enabled = true;
+            }
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
-
+            if (lbID.Text == "" || lbID.Text == "ID")
+            {
+                MessageBox.Show("Bạn Chưa Chọn Giáo Viên Nào để Xóa !", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else
+            {
+                if (MessageBox.Show("Bạn Có Chắc Chắn Muốn Xóa Không ??", "*Chú Ý:", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    obj.Delete_GiaoVien(lbID.Text);
+                    MessageBox.Show("Đã Xóa", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                    LoadTable();
+                }
+            }
         }
 
-        private void txtSearch_TextChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Hàm chuyển chữ thường sang chữ HOA
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public string ChuanHoa(string str)
         {
-            
-            
+            str = str.ToUpper();
+            return str;
         }
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-        }
-
-        // Hàm lưu ảnh
+        /// <summary>
+        /// Hàm Lưu Ảnh
+        /// </summary>
+        /// <param name="ID"></param>
         public void SavePicture(string ID)
         {
             try
@@ -114,13 +137,25 @@ namespace QL_HSGVTHPT
                 cmd.Parameters.Add(new SqlParameter("@imges", imges));
                 int N = cmd.ExecuteNonQuery();
                 connection.Close();
-                MessageBox.Show(N.ToString() + "   " + "Thêm Ảnh Thành Công....!");
+                MessageBox.Show("Bạn Thêm Được: " + N.ToString()+" Ảnh");
                 pictGiaoVien.Image = null;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+            // lưu xong load lại bảng
+            dtGV = obj.SelectGV();
+            dgvGiaoVien.DataSource = dtGV;
+        }
+        /// <summary>
+        /// Hàm load Lại bảng
+        /// </summary>
+        public void LoadTable()
+        {
+            //Load lại bảng
+            dtGV = obj.SelectGV();
+            dgvGiaoVien.DataSource = dtGV;
         }
         /// <summary>
         ///  Sự Kiện Click vào nút Save
@@ -156,32 +191,42 @@ namespace QL_HSGVTHPT
         {
             try
             {
-                string sql = "select Pictures_GV from GiaoVien where MaGV=N'" + ID + "'";
-                if(connection.State != ConnectionState.Open)
+                // tạo điều kiện mà rỗng thì k hiển thị đc
+                if (obj.Check_Image(lbID.Text)==true)
                 {
-                    connection.Open();
-                    cmd = new SqlCommand(sql,connection);
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    reader.Read();
-                    if(reader.HasRows)
+                    if (MessageBox.Show("Không Có Ảnh, Mời Bạn Thêm Ảnh", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)==DialogResult.OK)
                     {
-                        byte[] img = (byte[])(reader[0]);
-                        if (img == null)
-                            pictGiaoVien.Image = null;
+                        groupBoxAnhGV.Enabled = true;
+                    }
+                }
+                else
+                {
+                    string sql = "select Pictures_GV from GiaoVien where MaGV=N'" + ID + "'";
+                    if (connection.State != ConnectionState.Open)
+                    {
+                        connection.Open();
+                        cmd = new SqlCommand(sql, connection);
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        reader.Read();
+                        if (reader.HasRows)
+                        {
+                            byte[] img = (byte[])(reader[0]);
+                            if (img == null)
+                                pictGiaoVien.Image = null;
+                            else
+                            {
+                                MemoryStream ms = new MemoryStream(img);
+                                pictGiaoVien.Image = Image.FromStream(ms);
+                            }
+                        }
                         else
                         {
-                            MemoryStream ms = new MemoryStream(img);
-                            pictGiaoVien.Image = Image.FromStream(ms);
+                            MessageBox.Show("Đối Tượng Được chọn Rỗng","Error",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
                         }
+                        connection.Close();
                     }
-                    else
-                    {
-                        MessageBox.Show("This is does not extit");
-                    }
-                    connection.Close();
-
-
                 }
+                dgvGiaoVien.Refresh();
             }
             catch(Exception ex)
             {
@@ -189,60 +234,141 @@ namespace QL_HSGVTHPT
             }
         }
 
-        
-
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
         //Hàm lưu 
         private void btnLuu_Click(object sender, EventArgs e)
         {
-            groupBoxAnhGV.Enabled = false;
-            if (txtHoTen.Text == "" || txtNgaySinh.Text == "" || txtGioiTinh.Text == "" || txtDiaChi.Text == "" || txtSDT.Text == "" || txtChucVu.Text == "" || txtQuocTich.Text == "" || txtDanToc.Text == "" || txtTonGiao.Text == "" || txtEmail.Text == ""||pictGiaoVien==null)
+            // sét điều kiện nếu có ID thì là thực hiện sửa, nếu ID= Rỗng thì là thêm
+            if (lbID.Text == "")
             {
-                MessageBox.Show("Error !", "Bạn Nhập Thiếu Thông Tin, Yêu Cầu Nhập Lại.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //Đóng group ảnh
+                groupBoxAnhGV.Enabled = false;
+                if (txtHoTen.Text == "" || txtNgaySinh.Text == "" || txtGioiTinh.Text == "" || txtQuocTich.Text == "" || txtDanToc.Text == "" || txtTonGiao.Text == "" || txtChucVu.Text == "" || txtSDT.Text == "" || txtDiaChi.Text == "" || txtEmail.Text == "")
+                {
+                    MessageBox.Show("Error !", "Bạn Nhập Thiếu Thông Tin, Yêu Cầu Nhập Lại.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    HoTen = ChuanHoa(txtHoTen.Text);
+                    NgaySinh = txtNgaySinh.Text;
+                    GioiTinh = txtGioiTinh.Text;
+                    DiaChi = txtDiaChi.Text;
+                    SDT_GV = txtSDT.Text;
+                    ChucVu = txtChucVu.Text;
+                    QuocTich = txtQuocTich.Text;
+                    DanToc = txtDanToc.Text;
+                    TonGiao = txtTonGiao.Text;
+                    Email = txtEmail.Text;
+                    MaMon = txtMonHoc.Text;
+
+                    // kiểm tra điều kiện, nếu tên đã có trong hệ thống thì k cho nhập
+                    if (obj.Check_Name(HoTen, NgaySinh, GioiTinh) == false)
+                    {
+                        obj.Insert_GV(HoTen, NgaySinh, GioiTinh, DiaChi, SDT_GV, ChucVu, QuocTich, DanToc, TonGiao, Email, MaMon);
+                        //Load lại bảng
+                        LoadTable();
+                        //Load vị trí ID giáo Viên lên label
+                        for (int i = 0; i < dgvGiaoVien.Rows.Count - 1; i++)
+                        {
+                            if (txtHoTen.Text == dgvGiaoVien.Rows[i].Cells[1].Value.ToString() || txtNgaySinh.Text == dgvGiaoVien.Rows[i].Cells[2].Value.ToString() || txtGioiTinh.Text == dgvGiaoVien.Rows[i].Cells[3].Value.ToString())
+                            {
+                                dgvGiaoVien.CurrentCell = dgvGiaoVien.Rows[i].Cells[1];
+                                TrungGian = dgvGiaoVien.Rows[i].Cells[0].Value.ToString();
+                            }
+                        }
+                        if (MessageBox.Show("Chúc Mừng Bạn Đã Lưu Thành Công,Tiếp Theo Mời bạn chọn Ảnh!", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Asterisk) == DialogResult.OK)
+                        {
+                            // mở ảnh, đóng phần nhập thông tin
+                            groupBoxAnhGV.Enabled = true;
+                            groupBoxThongTinCaNhan.Enabled = false;
+                            // lấy ID để lưu ảnh
+                            lbID.Text = TrungGian;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Lỗi : Tên Đã Tồn Tại Trong Hệ Thống, Yêu Cầu Nhập Lại.", "Error !", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        ActiveControl = txtHoTen;
+                    }
+                }
             }
             else
             {
-                HoTen = txtHoTen.Text.Trim();
-                NgaySinh = txtNgaySinh.Text.Trim();
-                GioiTinh = txtGioiTinh.Text.Trim();
-                DiaChi = txtDiaChi.Text.Trim();
-                SDT_GV = txtSDT.Text.Trim();
-                ChucVu = txtChucVu.Text.Trim();
-                QuocTich = txtQuocTich.Text.Trim();
-                DanToc = txtDanToc.Text.Trim();
-                TonGiao = txtTonGiao.Text.Trim();
-                Email = txtEmail.Text.Trim();
-                MaMon = txtMonHoc.Text.Trim();
-
-                obj.Insert_GV(HoTen, NgaySinh, GioiTinh, DiaChi, SDT_GV, ChucVu,QuocTich,DanToc,TonGiao,Email,MaMon);
-                // lưu ảnh
-
-                //// CHưa làm được lưu 1 cách hoàn chỉnh ===> nghiên cứu lại
-
-                if(MessageBox.Show("Mời bạn chọn Ảnh.", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Asterisk )==DialogResult.OK)
+                MaGV = lbID.Text;
+                HoTen = ChuanHoa(txtHoTen.Text);
+                NgaySinh = txtNgaySinh.Text;
+                GioiTinh = txtGioiTinh.Text;
+                DiaChi = txtDiaChi.Text;
+                SDT_GV = txtSDT.Text;
+                ChucVu = txtChucVu.Text;
+                QuocTich = txtQuocTich.Text;
+                DanToc = txtDanToc.Text;
+                TonGiao = txtTonGiao.Text;
+                Email = txtEmail.Text;
+                //MaMon = txtMonHoc.Text;
+                if(txtMonHoc.Text == "Ngữ Văn")
                 {
-                    groupBoxAnhGV.Enabled = true;
-                    for (int i = 0; i < dgvGiaoVien.Rows.Count - 1; i++)
-                    {
-                        if (HoTen == dgvGiaoVien.Rows[i].Cells[1].Value.ToString())
-                        {
-                            //dgvGiaoVien.CurrentCell = dgvGiaoVien.Rows[i].Cells[1];
-                            dgvGiaoVien.CurrentCell = dgvGiaoVien.Rows[i].Cells[0];
-                            SavePicture(dgvGiaoVien.Rows[i].Cells[0].Value.ToString());
-                            //Load lại bảng
-
-                            dtGV = obj.SelectGV();
-                            dgvGiaoVien.DataSource = dtGV;
-                            //Hiển thị thông báo lưu thành công
-                            MessageBox.Show("Mời bạn chọn Ảnh.", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                        }
-                    }
+                    MaMon = "1";
+                }
+                if (txtMonHoc.Text == "Toán")
+                {
+                    MaMon = "2";
+                }
+                if (txtMonHoc.Text == "Giáo Dục Công Dân")
+                {
+                    MaMon = "3";
+                }
+                if (txtMonHoc.Text == "Lịch Sử")
+                {
+                    MaMon = "4";
+                }
+                if (txtMonHoc.Text == "Địa Lý")
+                {
+                    MaMon = "5";
+                }
+                if (txtMonHoc.Text == "Hóa Học")
+                {
+                    MaMon = "7";
+                }
+                if (txtMonHoc.Text == "Sinh Học")
+                {
+                    MaMon = "8";
+                }
+                if (txtMonHoc.Text == "Công Nghệ")
+                {
+                    MaMon = "9";
+                }
+                if (txtMonHoc.Text == "Tin Học")
+                {
+                    MaMon = "10";
+                }
+                if (txtMonHoc.Text == "Giáo Dục Thể Chất")
+                {
+                    MaMon = "11";
+                }
+                if (txtMonHoc.Text == "Tiếng Anh")
+                {
+                    MaMon = "12";
+                }
+                if (txtMonHoc.Text == "Vật Lý")
+                {
+                    MaMon = "6";
                 }
 
+                obj.Update_TT_GiaoVien(MaGV,HoTen, NgaySinh, GioiTinh, DiaChi, SDT_GV, ChucVu, QuocTich, DanToc, TonGiao, Email, MaMon);
+                SavePicture(lbID.Text);
+                LoadTable();
+                if (MessageBox.Show("Chúc Mừng: Bạn đã Update thành công", "Thông Báo", MessageBoxButtons.OK, MessageBoxIcon.Asterisk) == DialogResult.OK)
+                {
+                    groupBoxAnhGV.Enabled = false;
+                    groupBoxThongTinCaNhan.Enabled = false;
+                }
             }
+           
         }
-
-
-
         /// <summary>
         /// Sự kiện click vào bảng GV
         /// </summary>
@@ -261,55 +387,58 @@ namespace QL_HSGVTHPT
             txtDanToc.Text = dgvGiaoVien.CurrentRow.Cells[9].Value.ToString();
             txtTonGiao.Text = dgvGiaoVien.CurrentRow.Cells[10].Value.ToString();
             txtEmail.Text = dgvGiaoVien.CurrentRow.Cells[11].Value.ToString();
-          //  txtMonHoc.Text = dgvGiaoVien.CurrentRow.Cells[13].Value.ToString();
+          //  txtMonHoc.Text = dgvGiaoVien.CurrentRow.Cells[12].Value.ToString();
 
 
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "1")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "1")
             {
                 txtMonHoc.Text = txtMonHoc.GetItemText("Ngữ Văn");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "2")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "2")
             {
                 txtMonHoc.Text = txtMonHoc.GetItemText("Toán");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "3")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "3")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(3);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Giáo Dục Công Dân");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "4")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "4")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(4);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Lịch Sử");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "5")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "5")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(5);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Địa Lý");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "6")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "6")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(6);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Vật Lý");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "7")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "7")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(7);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Hóa Học");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "8")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "8")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(8);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Sinh Học");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "9")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "9")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(9);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Công Nghệ");
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "10")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "10")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(10);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Tin Học");
 
             }
-            if (dgvGiaoVien.CurrentRow.Cells[13].Value.ToString() == "11")
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "11")
             {
-                txtMonHoc.Text = txtMonHoc.GetItemText(11);
+                txtMonHoc.Text = txtMonHoc.GetItemText("Giáo Dục Thể Chất");
             }
-          
+            if (dgvGiaoVien.CurrentRow.Cells[12].Value.ToString() == "11")
+            {
+                txtMonHoc.Text = txtMonHoc.GetItemText("Tiếng Anh");
+            }
             //Che giấu GroupBox
             groupBoxThongTinCaNhan.Enabled = false;
             groupBoxAnhGV.Enabled = false;
@@ -347,9 +476,14 @@ namespace QL_HSGVTHPT
                 {
                     for (int i = 0; i < dgvGiaoVien.Rows.Count - 1; i++)
                     {
-                        if (txtSearch.Text == dgvGiaoVien.Rows[i].Cells[1].Value.ToString())
+                        if (ChuanHoa(txtSearch.Text) == dgvGiaoVien.Rows[i].Cells[1].Value.ToString())
                         {
                             dgvGiaoVien.CurrentCell = dgvGiaoVien.Rows[i].Cells[1];
+                        }
+                        else
+                        {
+                            MessageBox.Show("Không Tìm Thấy: '"+txtSearch.Text+"' Trong Hệ Thống.","Thông Báo :", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            break;
                         }
                     }
                 }
